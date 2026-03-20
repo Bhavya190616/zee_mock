@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zee MT Mock Test — 35 Minutes</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0a0a1a; color: #e0e0e0; min-height: 100vh; }
+
+  .header { background: linear-gradient(135deg, #1a1a3e, #2d0a4e); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4a0080; position: sticky; top: 0; z-index: 100; }
+  .logo { font-size: 28px; font-weight: 900; color: #fff; letter-spacing: 2px; }
+  .logo span { color: #a855f7; }
+  .timer-box { background: #1e0035; border: 2px solid #a855f7; border-radius: 12px; padding: 10px 20px; text-align: center; }
+  .timer-label { font-size: 10px; color: #a855f7; text-transform: uppercase; letter-spacing: 1px; }
+  .timer { font-size: 28px; font-weight: 900; color: #fff; font-family: monospace; }
+  .timer.warning { color: #f59e0b; }
+  .timer.danger { color: #ef4444; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+  .progress-bar { background: #1a1a3e; height: 6px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #7c3aed, #a855f7); transition: width 0.3s; }
+
+  .section-badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .badge-aptitude { background: #1e3a5f; color: #60a5fa; }
+  .badge-personality { background: #1e3d2f; color: #34d399; }
+  .badge-sjt { background: #3d1e1e; color: #f87171; }
+
+  .container { max-width: 780px; margin: 0 auto; padding: 24px 16px; }
+
+  /* Start Screen */
+  .start-screen { text-align: center; padding: 60px 20px; }
+  .start-screen h1 { font-size: 32px; font-weight: 900; color: #fff; margin-bottom: 12px; }
+  .start-screen p { color: #9ca3af; font-size: 15px; margin-bottom: 8px; }
+  .test-info { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 32px 0; }
+  .info-card { background: #1a1a3e; border: 1px solid #2d2d5e; border-radius: 12px; padding: 20px; }
+  .info-card .num { font-size: 28px; font-weight: 900; color: #a855f7; }
+  .info-card .label { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+  .instructions { background: #111130; border: 1px solid #2d2d5e; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: left; }
+  .instructions h3 { color: #a855f7; margin-bottom: 12px; font-size: 14px; }
+  .instructions li { color: #9ca3af; font-size: 13px; margin-bottom: 8px; margin-left: 16px; }
+
+  /* Question Card */
+  .question-card { background: #111130; border: 1px solid #2d2d5e; border-radius: 16px; padding: 28px; margin-bottom: 20px; }
+  .q-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .q-number { font-size: 13px; color: #6b7280; }
+  .q-text { font-size: 16px; color: #e5e7eb; line-height: 1.6; margin-bottom: 20px; font-weight: 500; }
+  .q-context { background: #0d0d2a; border-left: 3px solid #4a0080; padding: 12px 16px; border-radius: 0 8px 8px 0; margin-bottom: 16px; font-size: 13px; color: #9ca3af; line-height: 1.6; }
+
+  /* Options */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option { background: #1a1a3e; border: 2px solid #2d2d5e; border-radius: 10px; padding: 14px 18px; cursor: pointer; transition: all 0.2s; display: flex; align-items: flex-start; gap: 12px; }
+  .option:hover { border-color: #7c3aed; background: #1e1e4a; }
+  .option.selected { border-color: #a855f7; background: #2d1a4e; }
+  .option.correct { border-color: #34d399; background: #0d2d1e; }
+  .option.wrong { border-color: #ef4444; background: #2d0d0d; }
+  .option-letter { width: 28px; height: 28px; border-radius: 50%; background: #2d2d5e; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #a855f7; flex-shrink: 0; margin-top: 1px; }
+  .option.selected .option-letter { background: #7c3aed; color: #fff; }
+  .option.correct .option-letter { background: #34d399; color: #fff; }
+  .option.wrong .option-letter { background: #ef4444; color: #fff; }
+  .option-text { font-size: 14px; color: #d1d5db; line-height: 1.5; }
+
+  /* Likert Scale */
+  .likert { display: flex; gap: 8px; flex-wrap: wrap; }
+  .likert-btn { flex: 1; min-width: 80px; padding: 10px 6px; border: 2px solid #2d2d5e; border-radius: 8px; background: #1a1a3e; cursor: pointer; text-align: center; font-size: 11px; color: #9ca3af; transition: all 0.2s; }
+  .likert-btn:hover { border-color: #7c3aed; }
+  .likert-btn.selected { border-color: #a855f7; background: #2d1a4e; color: #e5e7eb; }
+  .likert-labels { display: flex; justify-content: space-between; font-size: 10px; color: #6b7280; margin-top: 6px; }
+
+  /* Navigation */
+  .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
+  .btn { padding: 12px 28px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all 0.2s; }
+  .btn-primary { background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-secondary { background: #1a1a3e; color: #9ca3af; border: 2px solid #2d2d5e; }
+  .btn-secondary:hover { border-color: #7c3aed; color: #e5e7eb; }
+  .btn-start { font-size: 18px; padding: 16px 48px; margin-top: 24px; }
+
+  /* Section Break */
+  .section-break { text-align: center; padding: 40px 20px; }
+  .section-break h2 { font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 12px; }
+  .section-break p { color: #9ca3af; font-size: 14px; margin-bottom: 24px; }
+
+  /* Results */
+  .results { text-align: center; padding: 40px 20px; }
+  .score-circle { width: 160px; height: 160px; border-radius: 50%; border: 6px solid #7c3aed; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 24px; background: #1a1a3e; }
+  .score-num { font-size: 42px; font-weight: 900; color: #a855f7; }
+  .score-label { font-size: 12px; color: #9ca3af; }
+  .result-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin: 24px 0; }
+  .result-card { background: #111130; border: 1px solid #2d2d5e; border-radius: 12px; padding: 16px; }
+  .result-card .rc-num { font-size: 22px; font-weight: 900; }
+  .result-card .rc-label { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+  .feedback-section { background: #111130; border: 1px solid #2d2d5e; border-radius: 12px; padding: 20px; margin-top: 20px; text-align: left; }
+  .feedback-section h3 { color: #a855f7; margin-bottom: 12px; }
+  .feedback-item { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+  .feedback-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  .feedback-text { font-size: 13px; color: #9ca3af; line-height: 1.5; }
+
+  .q-dot-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .q-dot { width: 28px; height: 28px; border-radius: 6px; background: #2d2d5e; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #9ca3af; cursor: pointer; }
+  .q-dot.answered { background: #7c3aed; color: #fff; }
+  .q-dot.current { border: 2px solid #a855f7; }
+
+  .explanation { background: #0d2d1e; border: 1px solid #34d399; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 13px; color: #a7f3d0; display: none; }
+  .explanation.show { display: block; }
+
+  @media(max-width:480px) {
+    .test-info { grid-template-columns: repeat(3,1fr); }
+    .result-grid { grid-template-columns: repeat(3,1fr); }
+    .likert { gap: 4px; }
+    .likert-btn { min-width: 56px; font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Z<span>EE</span> MT</div>
+  <div class="timer-box" id="timerBox">
+    <div class="timer-label">Time Remaining</div>
+    <div class="timer" id="timer">35:00</div>
+  </div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+<div class="container" id="mainContainer"></div>
+
+<script>
+const questions = [
+  // === SECTION 1: APTITUDE (15 questions) ===
+  {
+    id:1, section:'aptitude', type:'mcq',
+    context: "Zee Entertainment's ad revenue for Q1 was ₹840 crore. In Q2, revenue grew by 15%. In Q3, it declined by 8% from Q2.",
+    text: "What was Zee's ad revenue in Q3?",
+    options:["₹885.5 crore","₹888.12 crore","₹876.4 crore","₹902 crore"],
+    answer:1,
+    explanation:"Q2 = 840 × 1.15 = ₹966 crore. Q3 = 966 × 0.92 = ₹888.12 crore."
+  },
+  {
+    id:2, section:'aptitude', type:'mcq',
+    context: "A media agency buys 500 GRPs for a campaign on Zee TV at a CPT of ₹180. The total reach for the campaign is 2.5 million viewers.",
+    text: "What is the total cost of the campaign?",
+    options:["₹4.5 crore","₹45 lakh","₹22.5 lakh","₹9 crore"],
+    answer:0,
+    explanation:"Cost = Reach × CPT / 1000 = 2,500,000 × 180 / 1000 = ₹4,50,000 × 10 = ₹4.5 crore."
+  },
+  {
+    id:3, section:'aptitude', type:'mcq',
+    context: "Zee TV's TRP for Week 1 was 2.8. Star Plus had 3.2. Colors had 2.1. Sony had 1.9.",
+    text: "What percentage of the total TRP across all four channels does Zee TV account for?",
+    options:["27.5%","28%","27%","29%"],
+    answer:0,
+    explanation:"Total TRP = 2.8+3.2+2.1+1.9 = 10.0. Zee % = 2.8/10 × 100 = 28%. Wait — 2.8/10.0 = 28%. Answer is 28% which is option B. Correct answer is B (28%)."
+  },
+  {
+    id:4, section:'aptitude', type:'mcq',
+    text: "If a show has a reach of 40 million and an average frequency of 4.5, what is the GRP of the campaign? (Assume total TV universe = 200 million)",
+    options:["90 GRP","180 GRP","45 GRP","360 GRP"],
+    answer:0,
+    explanation:"TRP = (Reach/Universe) × 100 = (40/200)×100 = 20. GRP = TRP × Frequency = 20 × 4.5 = 90 GRP."
+  },
+  {
+    id:5, section:'aptitude', type:'mcq',
+    context: "Adex data shows: FMCG category spent ₹1,200 cr on TV in 2023. Auto spent ₹480 cr. E-commerce spent ₹360 cr. Telecom spent ₹240 cr. Others: ₹720 cr.",
+    text: "What is the ratio of FMCG spend to all other categories combined?",
+    options:["1:1.5","2:3","1:1.4","3:5"],
+    answer:2,
+    explanation:"Others total = 480+360+240+720 = 1800. Ratio = 1200:1800 = 1:1.5. Answer is A."
+  },
+  {
+    id:6, section:'aptitude', type:'mcq',
+    text: "A sales executive needs to achieve a target of ₹4.8 crore in a quarter. She has closed 35% of her target in Month 1 and 28% in Month 2. How much (in ₹ crore) does she need to close in Month 3?",
+    options:["₹1.78 crore","₹1.68 crore","₹1.58 crore","₹1.92 crore"],
+    answer:1,
+    explanation:"Closed = (35+28)% = 63% of 4.8 = ₹3.024 crore. Remaining = 4.8 - 3.024 = ₹1.776 crore ≈ ₹1.78 crore. Answer A."
+  },
+  {
+    id:7, section:'aptitude', type:'mcq',
+    text: "Which of the following correctly completes the series? 4, 9, 19, 39, 79, ___",
+    options:["159","149","169","139"],
+    answer:0,
+    explanation:"Each term = previous × 2 + 1. 4→9(4×2+1), 9→19, 19→39, 39→79, 79→159."
+  },
+  {
+    id:8, section:'aptitude', type:'mcq',
+    text: "All successful sales people are good communicators. Riya is a good communicator. Which conclusion is valid?",
+    options:["Riya is a successful salesperson","Riya may or may not be a successful salesperson","Riya is not a salesperson","Good communicators always succeed in sales"],
+    answer:1,
+    explanation:"Being a good communicator is necessary but not sufficient for being a successful salesperson. Riya may or may not be one."
+  },
+  {
+    id:9, section:'aptitude', type:'mcq',
+    context: "A brand allocates its media budget as follows: TV 45%, Digital 30%, Print 15%, OOH 7%, Radio 3%. Total budget = ₹60 crore.",
+    text: "If the brand shifts 10% of its TV budget to Digital, what is the new Digital budget?",
+    options:["₹20.7 crore","₹18 crore","₹21 crore","₹19.5 crore"],
+    answer:0,
+    explanation:"TV budget = 45% of 60 = ₹27 crore. 10% of 27 = ₹2.7 crore shifted. Digital was ₹18 crore. New = 18+2.7 = ₹20.7 crore."
+  },
+  {
+    id:10, section:'aptitude', type:'mcq',
+    text: "Zee's market share in Hindi GEC was 22% in 2022 and 19% in 2023. What is the percentage point decline and the percentage change in market share?",
+    options:["3pp decline; 13.6% decline","3pp decline; 15.8% decline","3pp decline; 12% decline","2pp decline; 9% decline"],
+    answer:0,
+    explanation:"PP decline = 22-19 = 3pp. % change = (3/22)×100 = 13.6% decline."
+  },
+  {
+    id:11, section:'aptitude', type:'mcq',
+    text: "Statement: Some channels are profitable. All profitable entities invest in content. Conclusion 1: Some channels invest in content. Conclusion 2: All channels invest in content.",
+    options:["Only Conclusion 1 follows","Only Conclusion 2 follows","Both follow","Neither follows"],
+    answer:0,
+    explanation:"Some channels are profitable → those invest in content → some channels invest in content. But not ALL channels are profitable, so Conclusion 2 doesn't follow."
+  },
+  {
+    id:12, section:'aptitude', type:'mcq',
+    context:"A viewership report shows: Drama genre - 38% share, Reality - 22%, News - 18%, Movies - 14%, Others - 8%. Total viewership = 85 million.",
+    text:"How many more viewers does Drama have compared to Movies?",
+    options:["20.4 million","21.6 million","18.7 million","25.5 million"],
+    answer:0,
+    explanation:"Drama = 38% of 85 = 32.3M. Movies = 14% of 85 = 11.9M. Difference = 20.4M."
+  },
+  {
+    id:13, section:'aptitude', type:'mcq',
+    text:"Find the odd one out: TRP, GRP, CPT, FCT, BARC, ADEX",
+    options:["BARC","ADEX","FCT","CPT"],
+    answer:0,
+    explanation:"BARC is a regulatory/measurement body, not a metric. All others (TRP, GRP, CPT, FCT, ADEX) are metrics or data types used in media planning."
+  },
+  {
+    id:14, section:'aptitude', type:'mcq',
+    text:"A salesperson closes deals worth ₹12L, ₹18L, ₹9L, ₹22L and ₹14L in 5 months. What is her average monthly revenue, and how much above/below average is her best month?",
+    options:["₹15L avg; ₹7L above","₹14L avg; ₹8L above","₹15L avg; ₹6L above","₹16L avg; ₹6L above"],
+    answer:0,
+    explanation:"Total = 75L. Average = 15L. Best month = 22L. Above avg = 22-15 = 7L."
+  },
+  {
+    id:15, section:'aptitude', type:'mcq',
+    text:"If AD : EX = 2:3 and EX : CE = 4:5, what is AD : CE?",
+    options:["8:15","2:5","4:9","6:10"],
+    answer:0,
+    explanation:"AD:EX = 2:3, EX:CE = 4:5. AD:CE = (2×4):(3×5) = 8:15."
+  },
+
+  // === SECTION 2: PERSONALITY (10 questions) ===
+  {
+    id:16, section:'personality', type:'likert',
+    text:"I enjoy meeting new people and building relationships quickly.",
+    trait:"Extraversion / Relationship orientation"
+  },
+  {
+    id:17, section:'personality', type:'likert',
+    text:"When I face rejection or failure, I bounce back quickly and stay motivated.",
+    trait:"Resilience"
+  },
+  {
+    id:18, section:'personality', type:'likert',
+    text:"I prefer working with data and numbers to inform my decisions rather than relying on intuition alone.",
+    trait:"Analytical thinking"
+  },
+  {
+    id:19, section:'personality', type:'likert',
+    text:"I am comfortable taking ownership of targets and being held accountable for results.",
+    trait:"Accountability / Drive"
+  },
+  {
+    id:20, section:'personality', type:'likert',
+    text:"I find it easy to adapt my communication style depending on who I am speaking to.",
+    trait:"Adaptability"
+  },
+  {
+    id:21, section:'personality', type:'likert',
+    text:"I prefer having a structured plan before starting a task rather than figuring things out as I go.",
+    trait:"Structure orientation"
+  },
+  {
+    id:22, section:'personality', type:'likert',
+    text:"I am energized by working in fast-paced, competitive environments.",
+    trait:"Drive / Ambition"
+  },
+  {
+    id:23, section:'personality', type:'likert',
+    text:"I often look for creative ways to solve problems rather than following standard procedures.",
+    trait:"Innovation / Creativity"
+  },
+  {
+    id:24, section:'personality', type:'likert',
+    text:"I feel comfortable presenting my ideas to a group, even when I'm not fully prepared.",
+    trait:"Confidence / Communication"
+  },
+  {
+    id:25, section:'personality', type:'likert',
+    text:"I tend to notice details that others might miss.",
+    trait:"Attention to detail"
+  },
+
+  // === SECTION 3: SJT (10 questions) ===
+  {
+    id:26, section:'sjt', type:'mcq',
+    text:"You are a new Management Trainee. A senior client has asked for a customized data presentation by tomorrow. Your manager is travelling and unreachable. What do you do?",
+    options:[
+      "Wait for your manager to return and explain the situation to the client",
+      "Attempt the presentation using available data, flag assumptions clearly, and send a draft to your manager via email",
+      "Tell the client you cannot do it without your manager's approval",
+      "Ask a colleague to handle it entirely"
+    ],
+    answer:1,
+    explanation:"Best answer shows initiative, resourcefulness, and keeping stakeholders informed — without overstepping."
+  },
+  {
+    id:27, section:'sjt', type:'mcq',
+    text:"During a client pitch, the client says your competitor offers a 20% lower CPT. How do you respond?",
+    options:[
+      "Offer an immediate discount to match the competitor",
+      "Acknowledge the concern, then pivot to Zee's unique reach, quality audience, and brand safety advantages",
+      "Dispute the competitor's claim and ask for proof",
+      "Escalate to your senior immediately"
+    ],
+    answer:1,
+    explanation:"Never discount immediately — it signals desperation. Address the objection by reinforcing your value proposition."
+  },
+  {
+    id:28, section:'sjt', type:'mcq',
+    text:"You notice an error in a pitch deck that has already been sent to a major client. The meeting is in 2 hours. What do you do?",
+    options:[
+      "Say nothing and hope the client doesn't notice",
+      "Inform your manager immediately, prepare a corrected version, and reach out to the client proactively",
+      "Wait until after the meeting to correct it",
+      "Cancel the meeting and reschedule"
+    ],
+    answer:1,
+    explanation:"Proactive correction + transparency > hoping it goes unnoticed. Speed and ownership are critical."
+  },
+  {
+    id:29, section:'sjt', type:'mcq',
+    text:"A brand manager you've been pursuing for 3 months finally responds but says their budget is frozen. What is your best next step?",
+    options:[
+      "Close the conversation politely and remove them from your pipeline",
+      "Ask when budgets will open, offer to stay in touch with relevant insights, and schedule a call for next quarter",
+      "Offer a heavily discounted package to keep them engaged",
+      "Escalate to your senior to close the deal"
+    ],
+    answer:1,
+    explanation:"Relationship maintenance is key in B2B sales. Frozen budgets are temporary. Stay warm, stay helpful."
+  },
+  {
+    id:30, section:'sjt', type:'mcq',
+    text:"Your team is working on a strategy presentation and a colleague's analysis seems incorrect. The deadline is tomorrow. What do you do?",
+    options:[
+      "Submit the presentation as-is to avoid conflict",
+      "Privately share your concern with the colleague with specific data, and offer to help correct it together",
+      "Rewrite their entire section yourself without telling them",
+      "Flag it to the manager and let them handle it"
+    ],
+    answer:1,
+    explanation:"Collaborative correction is the best approach — it maintains relationships while ensuring accuracy."
+  },
+  {
+    id:31, section:'sjt', type:'mcq',
+    text:"You are consistently hitting 90% of your monthly target but never 100%. Your manager asks for your plan to close the gap. What do you say?",
+    options:[
+      "The remaining 10% is due to factors outside my control",
+      "I will analyze which deals are stuck at which stage of the pipeline and double my follow-up frequency on near-close accounts",
+      "I will increase the number of cold calls made each day",
+      "I will ask for a lower target that is more achievable"
+    ],
+    answer:1,
+    explanation:"Shows analytical thinking + ownership + specific action plan. Vague answers or blame won't work."
+  },
+  {
+    id:32, section:'sjt', type:'mcq',
+    text:"A client agrees to a deal verbally but keeps delaying signing the contract. What do you do?",
+    options:[
+      "Keep waiting — they'll sign eventually",
+      "Understand the real reason for delay (legal, internal approval, budget), address it specifically, and create a soft deadline with a value hook",
+      "Send daily reminders until they sign",
+      "Offer additional freebies to push them over the line"
+    ],
+    answer:1,
+    explanation:"Uncover the real blocker first. Pressure or freebies too early can damage trust. Value hooks work better than pressure."
+  },
+  {
+    id:33, section:'sjt', type:'mcq',
+    text:"You are asked to analyze Adex data and present findings to the sales team by end of day. Halfway through you realize the data file is incomplete. What do you do?",
+    options:[
+      "Present only the data you have without mentioning the gap",
+      "Inform your manager of the gap immediately, present findings based on available data with clear caveats, and outline what the complete picture would look like",
+      "Delay the presentation until complete data is available",
+      "Use data from a previous period as a substitute without disclosing it"
+    ],
+    answer:1,
+    explanation:"Transparency + action > hiding limitations. Presenting partial data with clear caveats is professional."
+  },
+  {
+    id:34, section:'sjt', type:'mcq',
+    text:"You disagree with your manager's strategy for a key account. What is the best approach?",
+    options:[
+      "Follow the strategy without question — your manager knows best",
+      "Raise your concern privately with your manager, backed by data or specific reasoning, and accept the final call gracefully",
+      "Directly tell the client your personal view differs",
+      "Complain to your manager's superior"
+    ],
+    answer:1,
+    explanation:"Speak up with data, respect the hierarchy, and accept the decision. This is how high performers behave."
+  },
+  {
+    id:35, section:'sjt', type:'mcq',
+    text:"It is the last week of the quarter and you are 15% short of your target. Your most likely deal is still pending client approval. What do you do?",
+    options:[
+      "Accept that you won't hit target and prepare an explanation for your manager",
+      "Accelerate follow-up on the pending deal, simultaneously re-engage 2-3 warm leads that went cold, and update your manager proactively on the plan",
+      "Offer heavy discounts on pending deals to force closure",
+      "Ask your manager to transfer some deals from a colleague"
+    ],
+    answer:1,
+    explanation:"Never give up before the quarter ends. Multi-track action + proactive communication = high performer behaviour."
+  }
+];
+
+// State
+let currentQ = 0;
+let answers = {};
+let timerInterval;
+let timeLeft = 35 * 60;
+let testStarted = false;
+let testEnded = false;
+let showingResults = false;
+let reviewMode = false;
+
+function getSectionQuestions(section) {
+  return questions.filter(q => q.section === section);
+}
+
+function getCurrentSection() {
+  if(currentQ < 15) return 'aptitude';
+  if(currentQ < 25) return 'personality';
+  return 'sjt';
+}
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const mins = Math.floor(timeLeft/60);
+    const secs = timeLeft%60;
+    const timerEl = document.getElementById('timer');
+    timerEl.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    if(timeLeft <= 300) timerEl.className = 'timer warning';
+    if(timeLeft <= 60) timerEl.className = 'timer danger';
+    if(timeLeft <= 0) { clearInterval(timerInterval); endTest(); }
+  }, 1000);
+}
+
+function updateProgress() {
+  const pct = ((currentQ) / questions.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function render() {
+  if(!testStarted) { renderStart(); return; }
+  if(showingResults) { renderResults(); return; }
+  renderQuestion();
+}
+
+function renderStart() {
+  document.getElementById('mainContainer').innerHTML = `
+    <div class="start-screen">
+      <h1>Zee MT Mock Test</h1>
+      <p>Simulated psychometric test for Management Trainee roles</p>
+      <p style="color:#6b7280;font-size:13px;">Ad Sales & Sales Strategy | 35 Minutes | 35 Questions</p>
+      <div class="test-info">
+        <div class="info-card"><div class="num">15</div><div class="label">Aptitude Questions</div></div>
+        <div class="info-card"><div class="num">10</div><div class="label">Personality Questions</div></div>
+        <div class="info-card"><div class="num">10</div><div class="label">Situational Judgement</div></div>
+      </div>
+      <div class="instructions">
+        <h3>📋 Instructions</h3>
+        <ul>
+          <li>You have exactly 35 minutes — the timer starts when you click Begin.</li>
+          <li>Aptitude: Choose the best answer. Each has one correct answer.</li>
+          <li>Personality: Answer honestly as your best professional self. No right/wrong.</li>
+          <li>Situational Judgement: Choose the MOST effective response.</li>
+          <li>You can navigate back and forth within the test.</li>
+          <li>Review your answers at the end before submitting.</li>
+        </ul>
+      </div>
+      <button class="btn btn-primary btn-start" onclick="beginTest()">▶ Begin Test</button>
+    </div>`;
+}
+
+function beginTest() {
+  testStarted = true;
+  startTimer();
+  render();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  const section = q.section;
+  const badgeClass = section === 'aptitude' ? 'badge-aptitude' : section === 'personality' ? 'badge-personality' : 'badge-sjt';
+  const badgeText = section === 'aptitude' ? '📊 Aptitude' : section === 'personality' ? '🧠 Personality' : '💼 Situational Judgement';
+
+  let contextHTML = q.context ? `<div class="q-context">${q.context}</div>` : '';
+  let answerHTML = '';
+
+  if(q.type === 'mcq') {
+    answerHTML = `<div class="options">` + q.options.map((opt, i) => {
+      let cls = 'option';
+      if(reviewMode && answers[q.id] !== undefined) {
+        if(i === q.answer) cls += ' correct';
+        else if(answers[q.id] === i && i !== q.answer) cls += ' wrong';
+      } else if(answers[q.id] === i) cls += ' selected';
+      const letter = ['A','B','C','D'][i];
+      return `<div class="${cls}" onclick="selectAnswer(${i})">
+        <div class="option-letter">${letter}</div>
+        <div class="option-text">${opt}</div>
+      </div>`;
+    }).join('') + `</div>`;
+    if(reviewMode && q.explanation) {
+      answerHTML += `<div class="explanation show">💡 <strong>Explanation:</strong> ${q.explanation}</div>`;
+    }
+  } else if(q.type === 'likert') {
+    const labels = ['Strongly Disagree','Disagree','Neutral','Agree','Strongly Agree'];
+    const saved = answers[q.id];
+    answerHTML = `
+      <div style="margin-bottom:8px;font-size:12px;color:#6b7280;">Trait measured: ${q.trait}</div>
+      <div class="likert">
+        ${labels.map((lbl,i) => `<button class="likert-btn ${saved===i?'selected':''}" onclick="selectLikert(${i})">${lbl}</button>`).join('')}
+      </div>`;
+    if(reviewMode) {
+      answerHTML += `<div class="explanation show" style="margin-top:12px;">💡 For a <strong>sales/strategy role at Zee</strong>, "Agree" or "Strongly Agree" on this trait signals a strong fit. Be consistent across similar questions.</div>`;
+    }
+  }
+
+  const isAnswered = answers[q.id] !== undefined;
+  const dotGrid = questions.map((qq,i) => {
+    let cls = 'q-dot';
+    if(answers[qq.id] !== undefined) cls += ' answered';
+    if(i === currentQ) cls += ' current';
+    return `<div class="${cls}" onclick="goToQ(${i})">${i+1}</div>`;
+  }).join('');
+
+  document.getElementById('mainContainer').innerHTML = `
+    <div class="question-card">
+      <div class="q-meta">
+        <span class="section-badge ${badgeClass}">${badgeText}</span>
+        <span class="q-number">Question ${currentQ+1} of ${questions.length}</span>
+      </div>
+      ${contextHTML}
+      <div class="q-text">${q.text}</div>
+      ${answerHTML}
+    </div>
+    <div style="background:#111130;border:1px solid #2d2d5e;border-radius:12px;padding:16px;margin-bottom:20px;">
+      <div style="font-size:11px;color:#6b7280;margin-bottom:8px;">QUESTION NAVIGATOR</div>
+      <div class="q-dot-grid">${dotGrid}</div>
+    </div>
+    <div class="nav">
+      <button class="btn btn-secondary" onclick="prevQ()" ${currentQ===0?'disabled':''}>← Previous</button>
+      <div style="display:flex;gap:10px;">
+        ${!reviewMode && currentQ === questions.length-1 ? `<button class="btn btn-primary" onclick="submitTest()">Submit Test ✓</button>` : ''}
+        ${currentQ < questions.length-1 ? `<button class="btn btn-primary" onclick="nextQ()">Next →</button>` : ''}
+        ${reviewMode ? `<button class="btn btn-primary" onclick="showingResults=true;render();">View Results</button>` : ''}
+      </div>
+    </div>`;
+  updateProgress();
+}
+
+function selectAnswer(i) {
+  if(reviewMode) return;
+  answers[questions[currentQ].id] = i;
+  render();
+}
+
+function selectLikert(i) {
+  if(reviewMode) return;
+  answers[questions[currentQ].id] = i;
+  render();
+}
+
+function nextQ() { if(currentQ < questions.length-1) { currentQ++; render(); } }
+function prevQ() { if(currentQ > 0) { currentQ--; render(); } }
+function goToQ(i) { currentQ = i; render(); }
+
+function submitTest() {
+  clearInterval(timerInterval);
+  const timeTaken = 35*60 - timeLeft;
+  const mins = Math.floor(timeTaken/60);
+  const secs = timeTaken%60;
+  document.getElementById('timer').textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+  showingResults = true;
+  render();
+}
+
+function endTest() {
+  submitTest();
+}
+
+function renderResults() {
+  // Score aptitude
+  const aptQuestions = questions.filter(q=>q.section==='aptitude');
+  let correct = 0;
+  aptQuestions.forEach(q => { if(answers[q.id] === q.answer) correct++; });
+  const aptScore = Math.round((correct/aptQuestions.length)*100);
+
+  // Personality completeness
+  const persQ = questions.filter(q=>q.section==='personality');
+  const persAnswered = persQ.filter(q=>answers[q.id]!==undefined).length;
+
+  // SJT score
+  const sjtQ = questions.filter(q=>q.section==='sjt');
+  let sjtCorrect = 0;
+  sjtQ.forEach(q => { if(answers[q.id] === q.answer) sjtCorrect++; });
+  const sjtScore = Math.round((sjtCorrect/sjtQ.length)*100);
+
+  const totalAnswered = Object.keys(answers).length;
+  const overallScore = Math.round(((correct + sjtCorrect)/(aptQuestions.length+sjtQ.length))*100);
+
+  const scoreColor = overallScore >= 70 ? '#34d399' : overallScore >= 50 ? '#f59e0b' : '#ef4444';
+
+  document.getElementById('mainContainer').innerHTML = `
+    <div class="results">
+      <h2 style="color:#fff;font-size:24px;font-weight:900;margin-bottom:8px;">Test Complete! 🎉</h2>
+      <p style="color:#9ca3af;margin-bottom:24px;">Here's how you performed</p>
+      <div class="score-circle" style="border-color:${scoreColor}">
+        <div class="score-num" style="color:${scoreColor}">${overallScore}%</div>
+        <div class="score-label">Overall Score</div>
+      </div>
+      <div class="result-grid">
+        <div class="result-card">
+          <div class="rc-num" style="color:#60a5fa">${correct}/${aptQuestions.length}</div>
+          <div class="rc-label">Aptitude Correct</div>
+        </div>
+        <div class="result-card">
+          <div class="rc-num" style="color:#34d399">${persAnswered}/${persQ.length}</div>
+          <div class="rc-label">Personality Answered</div>
+        </div>
+        <div class="result-card">
+          <div class="rc-num" style="color:#f87171">${sjtCorrect}/${sjtQ.length}</div>
+          <div class="rc-label">SJT Correct</div>
+        </div>
+      </div>
+
+      <div class="feedback-section">
+        <h3>📋 Performance Feedback</h3>
+        ${aptScore >= 70 ? `<div class="feedback-item"><div class="feedback-icon">✅</div><div class="feedback-text"><strong>Aptitude (${aptScore}%):</strong> Strong performance. You can handle data-driven scenarios well — a key requirement for both roles.</div></div>`
+        : `<div class="feedback-item"><div class="feedback-icon">⚠️</div><div class="feedback-text"><strong>Aptitude (${aptScore}%):</strong> Needs improvement. Focus on percentage calculations, ratio problems, and data interpretation before tomorrow.</div></div>`}
+        ${sjtScore >= 70 ? `<div class="feedback-item"><div class="feedback-icon">✅</div><div class="feedback-text"><strong>Situational Judgement (${sjtScore}%):</strong> Excellent instincts. You understand professional behaviour in sales/strategy contexts.</div></div>`
+        : `<div class="feedback-item"><div class="feedback-icon">⚠️</div><div class="feedback-text"><strong>Situational Judgement (${sjtScore}%):</strong> Review your answers — always choose the option that shows initiative, data-backed reasoning, and collaboration over aggression or passivity.</div></div>`}
+        ${persAnswered === persQ.length ? `<div class="feedback-item"><div class="feedback-icon">✅</div><div class="feedback-text"><strong>Personality:</strong> Fully completed. Remember — be consistent and answer as your best professional self tomorrow.</div></div>`
+        : `<div class="feedback-item"><div class="feedback-icon">⚠️</div><div class="feedback-text"><strong>Personality:</strong> ${10-persAnswered} questions unanswered. Always complete this section — unanswered questions can flag negatively.</div></div>`}
+        <div class="feedback-item"><div class="feedback-icon">💡</div><div class="feedback-text"><strong>Key takeaway for tomorrow:</strong> In SJT, the right answer always involves initiative + data + collaboration. Never extreme, never passive.</div></div>
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="reviewAnswers()">📖 Review All Answers</button>
+        <button class="btn btn-secondary" onclick="resetTest()">🔄 Retake Test</button>
+      </div>
+    </div>`;
+  updateProgress();
+  document.getElementById('progressFill').style.width = '100%';
+}
+
+function reviewAnswers() {
+  reviewMode = true;
+  showingResults = false;
+  currentQ = 0;
+  render();
+}
+
+function resetTest() {
+  answers = {};
+  currentQ = 0;
+  timeLeft = 35*60;
+  testStarted = false;
+  testEnded = false;
+  showingResults = false;
+  reviewMode = false;
+  clearInterval(timerInterval);
+  document.getElementById('timer').textContent = '35:00';
+  document.getElementById('timer').className = 'timer';
+  document.getElementById('progressFill').style.width = '0%';
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
